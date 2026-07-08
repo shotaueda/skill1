@@ -1,5 +1,5 @@
 ---
-name: ouchi-no-mikata-slides
+name: libeo-client-slides
 description: >
   株式会社LIBEO が「案件ごとのクライアント」向けに作る報告・提案スライドの共通テーマ。
   クライアント名・ロゴは固定ではなく、案件ごとに渡すパラメータ（client/logo）。

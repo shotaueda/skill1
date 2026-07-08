@@ -43,7 +43,7 @@ Claudeへの実際のアクセス方法（アプリ／ブラウザ／社内の�
 
 ### ブラウザ版・アプリ版のClaude（claude.ai／デスクトップアプリ）を使っている場合
 
-1. `ouchi-no-mikata-slides` フォルダを**そのままzip形式に圧縮**する
+1. `libeo-client-slides` フォルダを**そのままzip形式に圧縮**する
    （フォルダの中身だけでなく、フォルダごとzip化するのがポイント）
 2. 画面の **設定（Settings）→ Customize → Skills** を開く
 3. 「Upload（アップロード）」から、作ったzipファイルを選ぶ
@@ -54,10 +54,10 @@ Claudeへの実際のアクセス方法（アプリ／ブラウザ／社内の�
 ### Claude Code（ターミナルやVS Code等で使っている場合）
 
 1. フォルダをそのまま、パソコンの以下のどちらかにコピーする
-   - 自分専用として使う場合：`~/.claude/skills/ouchi-no-mikata-slides/`
-   - 特定のプロジェクトだけで使う場合：`.claude/skills/ouchi-no-mikata-slides/`
+   - 自分専用として使う場合：`~/.claude/skills/libeo-client-slides/`
+   - 特定のプロジェクトだけで使う場合：`.claude/skills/libeo-client-slides/`
 2. 中に `SKILL.md` が入っていればそれでOK。特別な登録コマンドは不要（自動で見つかります）
-3. 新しく会話を始めれば使えます。試しに `/ouchi-no-mikata-slides` と打つと呼び出せます
+3. 新しく会話を始めれば使えます。試しに `/libeo-client-slides` と打つと呼び出せます
 
 > どちらか分からない場合：普段Claudeをブラウザやアプリで開いているなら前者、
 > ターミナル／VS Code等でコマンドとして使っているなら後者です。迷ったら社内のClaude担当者に確認してください。

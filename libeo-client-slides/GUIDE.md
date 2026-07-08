@@ -28,16 +28,16 @@
 
 **claude.ai（ブラウザ／デスクトップアプリ）の場合**
 
-1. `ouchi-no-mikata-slides` フォルダをそのままzip形式に圧縮する
+1. `libeo-client-slides` フォルダをそのままzip形式に圧縮する
 2. 設定（Settings）→ Customize → Skills → Upload から、そのzipをアップロードする
 3. チャット下部の「Skills」一覧に表示されれば登録完了
 
 **Claude Code（CLI／VS Code等）の場合**
 
-1. `ouchi-no-mikata-slides` フォルダを `~/.claude/skills/`（個人用）または
+1. `libeo-client-slides` フォルダを `~/.claude/skills/`（個人用）または
    `.claude/skills/`（プロジェクト用）にそのままコピーする
 2. `SKILL.md` が入っていれば自動で認識される。特別なコマンドは不要
-3. 新しい会話で `/ouchi-no-mikata-slides` と打てば呼び出せる
+3. 新しい会話で `/libeo-client-slides` と打てば呼び出せる
 
 どちらの場合も、これで準備完了。あとは普通に話しかけるだけです。
 （超入門編は同じフォルダの `GETTING-STARTED.md` も参照してください）
