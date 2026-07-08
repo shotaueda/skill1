@@ -1,35 +1,63 @@
-/* 花光向け レポートテーマ — 参照デッキ（視覚仕様書）生成
- * theme.js の全パーツ（才流由来の基本パーツ＋今回追加した高密度パーツ）を
- * 一通り使い切ったサンプル。新しいスライドを作る際のコピー元にする。 */
+/* 株式会社LIBEO クライアント報告・提案スライド — 参照デッキ（視覚仕様書）生成
+ * theme.js の全パーツ（才流由来の基本パーツ＋高密度パーツ）を一通り使い切ったサンプル。
+ * 新しいスライドを作る際のコピー元にする。
+ *
+ * client まわりは架空の案件データ（「株式会社サンプル」向けWeb集客レポート）で組んでいる。
+ * 実案件では client / logo / 数値 / メッセージ を差し替えるだけでよい。
+ * 制作者（LIBEO）側の情報は theme.js の `T.LIBEO` に実データを持たせてあるので、
+ * companyProfile など「私たちについて」を見せるパーツはそのまま使える。 */
 const T = require('./theme.js');
-const { C } = T;
+const { C, LIBEO } = T;
 
 (async () => {
   const p = T.newDeck({ title: 'Web集客 月次レポート' });
 
-  /* 1. 表紙 */
+  /* 1. 表紙（client は案件ごとに差し替える。ここではサンプル案件名） */
   T.titleSlide(p, {
     title: 'Web集客 月次レポート',
     subtitle: '2026年6月度',
-    client: '株式会社花光',          // logo: '/path/to/hanamitsu-logo-white.png' を渡せばロゴに
+    client: '株式会社サンプル',        // logo: '/path/to/client-logo-white.png' を渡せばロゴに
     date: '2026年6月',
-    presenter: '株式会社LIBEO',
+    // presenter は既定で LIBEO.name（株式会社LIBEO）。案件により変えたい場合のみ指定。
   });
 
-  /* 2. アジェンダ */
+  /* 2. 私たちについて（LIBEO自己紹介。提案書の冒頭やアポ資料で使う） */
+  {
+    const s = T.contentSlide(p, {
+      kicker: 'About us', page: 1,
+      title: '私たちについて',
+      message: 'Webマーケティング・Web制作・プロダクションマネジメントをワンストップで支援します。',
+    });
+    T.companyProfile(s, p, {
+      y: s.bodyTop, h: 2.6,
+      facts: [
+        { label: '事業内容', value: LIBEO.business },
+        { label: '所在地', value: '大阪府大阪市西区新町' },
+        { label: '代表者', value: LIBEO.ceo },
+        { label: 'サービス', value: 'SEO / 検索広告 / SNS広告 / Web制作' },
+      ],
+      stats: [
+        { label: '設立', value: '2018', unit: '年' },
+        { label: '資本金', value: '900', unit: '万円' },
+      ],
+    });
+    T.note(s, `出典: ${LIBEO.url}（法人情報は公開情報に基づく）`);
+  }
+
+  /* 3. アジェンダ */
   T.agenda(p, {
     title: '本日お伝えすること',
-    page: 1,
+    page: 2,
     items: [
       '今月のサマリー（KPIハイライト）', '検索流入の推移と要因', 'データ運用の認識ギャップ',
       '競合サイトとのポジション比較', '改善のビフォー/アフター', '来月の打ち手とロードマップ',
     ],
   });
 
-  /* 3. 章扉 */
+  /* 4. 章扉 */
   T.sectionDivider(p, { no: 1, total: 3, title: '今月のサマリー' });
 
-  /* 4. 数値ハイライト */
+  /* 5. 数値ハイライト */
   {
     const s = T.contentSlide(p, {
       kicker: 'サマリー', page: 3,
@@ -48,7 +76,7 @@ const { C } = T;
     T.note(s, '出典: Google Search Console / GA4（2026-06-01〜06-30）。電話CVは Salesforce 連携データ。');
   }
 
-  /* 5. グラフ＋読み解き（複合パーツで密度アップ） */
+  /* 6. グラフ＋読み解き（複合パーツで密度アップ） */
   {
     const s = T.contentSlide(p, {
       kicker: 'サマリー', page: 4,
@@ -64,7 +92,7 @@ const { C } = T;
     });
   }
 
-  /* 6. ミニKPIストリップ＋評価表（1枚の情報密度を上げる構成） */
+  /* 7. ミニKPIストリップ＋評価表（1枚の情報密度を上げる構成） */
   {
     const s = T.contentSlide(p, {
       kicker: 'サマリー', page: 5,
@@ -93,7 +121,7 @@ const { C } = T;
     });
   }
 
-  /* 7. 認識ギャップ分析（現場の声 × データの実態） */
+  /* 8. 認識ギャップ分析（現場の声 × データの実態） */
   {
     const s = T.contentSlide(p, {
       kicker: 'データ運用', page: 6,
@@ -103,7 +131,7 @@ const { C } = T;
     T.gapAnalysis(s, p, {
       y: s.bodyTop,
       persona: { icon: 'user', name: 'マーケ担当' },
-      quote: '検索広告で「対応外×薬剤名×効かない」の語句からCVが取れている。この系統を強化したい。',
+      quote: '検索広告で「対応外×商品名×効かない」の語句からCVが取れている。この系統を強化したい。',
       left: {
         icon: 'search', head: 'CRMで見えているデータ',
         items: ['問い合わせ率は上昇（数値上は良好）', '失注理由は「対象外」として記録', '現調獲得率が低下（原因が見えない）'],
@@ -116,7 +144,7 @@ const { C } = T;
     });
   }
 
-  /* 8. 2カラム対比（アイコン付き見出し） */
+  /* 9. 2カラム対比（アイコン付き見出し） */
   {
     const s = T.contentSlide(p, {
       kicker: '課題と打ち手', page: 7,
@@ -134,7 +162,7 @@ const { C } = T;
     });
   }
 
-  /* 9. ビフォー/アフター（自由記述の状態比較） */
+  /* 10. ビフォー/アフター（自由記述の状態比較） */
   {
     const s = T.contentSlide(p, {
       kicker: '改善提案', page: 8,
@@ -148,7 +176,7 @@ const { C } = T;
     });
   }
 
-  /* 10. 特長カード（アイコン付き） */
+  /* 11. 特長カード（アイコン付き） */
   {
     const s = T.contentSlide(p, {
       kicker: '提案', page: 9,
@@ -165,7 +193,7 @@ const { C } = T;
     });
   }
 
-  /* 11. 評価表（◎○△✕） */
+  /* 12. 評価表（◎○△✕） */
   {
     const s = T.contentSlide(p, {
       kicker: '競合比較', page: 10,
@@ -187,7 +215,7 @@ const { C } = T;
     T.note(s, '◎ 優位 / ○ 同等 / △ やや劣位 / ✕ 劣位。評価は2026年6月時点の各社サイト調査に基づく。');
   }
 
-  /* 12. ポジショニングマップ */
+  /* 13. ポジショニングマップ */
   {
     const s = T.contentSlide(p, {
       kicker: '競合環境', page: 11,
@@ -207,7 +235,7 @@ const { C } = T;
     });
   }
 
-  /* 13. ベン図（重複領域の説明） */
+  /* 14. ベン図（重複領域の説明） */
   {
     const s = T.contentSlide(p, {
       kicker: '市場理解', page: 12,
@@ -225,7 +253,7 @@ const { C } = T;
     });
   }
 
-  /* 14. 組織図（対応体制） */
+  /* 15. 組織図（対応体制） */
   {
     const s = T.contentSlide(p, {
       kicker: '実行体制', page: 13,
@@ -244,7 +272,7 @@ const { C } = T;
     });
   }
 
-  /* 15. TAM-SAM-SOM */
+  /* 16. TAM-SAM-SOM */
   {
     const s = T.contentSlide(p, {
       kicker: '市場規模', page: 14,
@@ -261,7 +289,7 @@ const { C } = T;
     });
   }
 
-  /* 16. ガントチャート */
+  /* 17. ガントチャート */
   {
     const s = T.contentSlide(p, {
       kicker: 'ロードマップ', page: 15,
@@ -281,10 +309,28 @@ const { C } = T;
     });
   }
 
-  /* 17. ピラミッド階層 */
+  /* 18. タイムライン（節目だけを軽く見せたい時。ガントより簡易な年表） */
   {
     const s = T.contentSlide(p, {
-      kicker: '戦略整理', page: 16,
+      kicker: 'ロードマップ', page: 16,
+      title: '主要マイルストーン',
+      message: '節目ごとの意思決定ポイントを、日付付きの年表で共有します。',
+    });
+    T.timeline(s, p, {
+      y: s.bodyTop + 1.4,
+      milestones: [
+        { date: '2026-07', label: 'キックオフ', desc: 'CRM項目整備開始' },
+        { date: '2026-08', label: '中間レビュー', desc: 'フォーム改善公開' },
+        { date: '2026-10', label: '効果測定', desc: 'A/Bテスト結果報告' },
+        { date: '2027-01', label: '次期計画策定', desc: '指名検索施策を協議' },
+      ],
+    });
+  }
+
+  /* 19. ピラミッド階層 */
+  {
+    const s = T.contentSlide(p, {
+      kicker: '戦略整理', page: 17,
       title: '取り組みの優先順位ピラミッド',
       message: '土台となるデータ精度から着手し、最終的に指名検索の育成へ積み上げます。',
     });
@@ -299,10 +345,10 @@ const { C } = T;
     });
   }
 
-  /* 18. 事例カード */
+  /* 20. 事例カード */
   {
     const s = T.contentSlide(p, {
-      kicker: '参考事例', page: 17,
+      kicker: '参考事例', page: 18,
       title: '類似施策での改善事例',
       message: '同種の施策で、いずれも問い合わせ数が2倍前後に伸びた実績があります。',
     });
@@ -316,12 +362,12 @@ const { C } = T;
     });
   }
 
-  /* 19. ペルソナカード */
+  /* 21. ペルソナカード */
   {
     const s = T.contentSlide(p, {
-      kicker: '顧客理解', page: 18,
+      kicker: '顧客理解', page: 19,
       title: '主要ペルソナの整理',
-      message: '年齢層・検討軸の異なる2つのペルソナに向けて、訴求を出し分けます。',
+      message: '検討フェーズの異なる3つのペルソナに向けて、訴求を出し分けます。',
     });
     T.personaCard(s, p, {
       y: s.bodyTop, h: 2.9,
@@ -333,10 +379,10 @@ const { C } = T;
     });
   }
 
-  /* 20. カスタマージャーニー */
+  /* 22. カスタマージャーニー */
   {
     const s = T.contentSlide(p, {
-      kicker: '顧客理解', page: 19,
+      kicker: '顧客理解', page: 20,
       title: '問い合わせまでのカスタマージャーニー',
       message: '比較検討フェーズでの離脱が最も多く、事例コンテンツの拡充が鍵になります。',
     });
@@ -352,10 +398,10 @@ const { C } = T;
     });
   }
 
-  /* 21. プロセストレイル（zigzag） */
+  /* 23. プロセストレイル（zigzag） */
   {
     const s = T.contentSlide(p, {
-      kicker: '実行プロセス', page: 20,
+      kicker: '実行プロセス', page: 21,
       title: 'データ改善の実行プロセス',
       message: '「発見→分類→ルール化→運用定着」の4段階で、CRMデータの精度を上げます。',
     });
@@ -370,10 +416,10 @@ const { C } = T;
     });
   }
 
-  /* 22. チェックリスト（まとめ） */
+  /* 24. チェックリスト（まとめ） */
   {
     const s = T.contentSlide(p, {
-      kicker: 'まとめ', page: 21,
+      kicker: 'まとめ', page: 22,
       title: '今月のまとめと次のステップ',
       message: 'データ精度・導線・指名検索の3点を来月も継続してモニタリングします。',
     });
@@ -388,13 +434,13 @@ const { C } = T;
     T.conclusionBand(s, p, { text: '→ 来月は「データ精度」と「CV導線」の両輪で改善を継続します。' });
   }
 
-  /* 23. 章扉（2） */
+  /* 25. 章扉（2） */
   T.sectionDivider(p, { no: 2, total: 3, title: '来月の打ち手' });
 
-  /* 24. KPIファネル */
+  /* 26. KPIファネル */
   {
     const s = T.contentSlide(p, {
-      kicker: '目標設定', page: 23,
+      kicker: '目標設定', page: 24,
       title: '来期のKPIツリー',
       message: '流入→相談→受注の各段階で目標を設定し、ボトルネックを可視化します。',
     });
@@ -409,10 +455,27 @@ const { C } = T;
     });
   }
 
-  /* 25. STEPロードマップ */
+  /* 27. プラン比較（追加でご提案するプラン。おすすめプランをハイライト） */
   {
     const s = T.contentSlide(p, {
-      kicker: 'ロードマップ', page: 24,
+      kicker: 'ご提案', page: 25,
+      title: '来月からの支援プラン',
+      message: '現状の課題感から、標準プランでの継続をおすすめします。',
+    });
+    T.pricingTable(s, p, {
+      y: s.bodyTop + 0.1, h: 2.7,
+      plans: [
+        { name: 'ライトプラン', price: '15万円', priceUnit: '/月', items: ['月次レポート', 'SEO簡易チェック', 'メール相談'] },
+        { name: '標準プラン', price: '30万円', priceUnit: '/月', featured: true, items: ['月次レポート＋分析', 'SEO/広告運用の実行', 'フォーム改善提案', '月1回定例MTG'] },
+        { name: '拡張プラン', price: '50万円', priceUnit: '/月', items: ['標準プランの全て', 'LP/バナー制作', '週次モニタリング', '専任ディレクター'] },
+      ],
+    });
+  }
+
+  /* 28. STEPロードマップ */
+  {
+    const s = T.contentSlide(p, {
+      kicker: 'ロードマップ', page: 26,
       title: '中期ロードマップ（3フェーズ）',
       message: 'まず土台（コンテンツ）、次に刈り取り（導線）、最後にブランド（指名）の順で積み上げます。',
     });
@@ -426,9 +489,9 @@ const { C } = T;
     });
   }
 
-  /* 26. 締め */
+  /* 29. 締め（client は案件ごとに差し替える） */
   T.closingSlide(p, {
-    client: '株式会社花光',          // logo を渡せば白ロゴを表示
+    client: '株式会社サンプル',        // logo を渡せば白ロゴを表示
     title: 'ご清覧ありがとうございました',
     lines: ['ご不明点・追加のご要望がございましたら', '担当までお申し付けください。'],
   });

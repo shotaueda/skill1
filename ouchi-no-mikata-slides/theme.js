@@ -1,14 +1,15 @@
 /**
- * 花光向け レポート — Slide Theme Module  (for PptxGenJS)
+ * 株式会社LIBEO クライアント報告・提案スライド — Slide Theme Module  (for PptxGenJS)
  * ------------------------------------------------------------
- * 株式会社LIBEO が株式会社花光向けに作るクライアント報告・提案スライドの共通テーマ。
+ * 株式会社LIBEO が「案件ごとのクライアント」向けに作る報告・提案スライドの共通テーマ。
+ * クライアント名・ロゴは固定ではなく、常に呼び出し側が渡すパラメータ（client/logo）。
  * 才流テンプレートの「構造的な見せ方」を、寒色系のブランド配色
  * （ブルー #2F6FEB 中心＋ネイビー・アイス・ミスト）でリスキンしたもの。
  *
  * 使い方:
  *   const T = require('./theme.js');
  *   const pptx = T.newDeck();
- *   T.titleSlide(pptx, {...});
+ *   T.titleSlide(pptx, { client: '株式会社◯◯', ... }); // client は案件ごとに差し替え
  *   const s = T.contentSlide(pptx, { kicker, message, title, page });
  *   ...(s に対して addText/addShape 等を重ねる)...
  *   await T.save(pptx, 'out.pptx');
@@ -16,6 +17,19 @@
  * 座標系は 16:9 = 10in × 5.625in。
  */
 const path = require('path');
+
+/* 制作者（LIBEO自身）の会社情報。案件によらず固定。表紙/締めの制作者表記の既定値や、
+ * LIBEO自己紹介スライド（companyProfile）に使う。 */
+const LIBEO = {
+  name: '株式会社LIBEO',
+  url: 'https://libeo.co.jp/',
+  address: '〒550-0013 大阪府大阪市西区新町1-24-11 新町F1ビル502',
+  established: '2018年5月8日',
+  ceo: '嘉島 元貴',
+  capital: '資本金900万円',
+  business: 'Webマーケティング・Web制作・プロダクションマネジメント事業',
+  tagline: 'SEO・検索広告・SNS広告・Web制作をワンストップで支援',
+};
 
 /* =========================================================
  * 1. デザイントークン
@@ -211,7 +225,7 @@ function contentSlide(p, { kicker, message, title, page } = {}) {
 }
 
 /** 表紙（濃紺背景。logo に白ロゴのパスを渡すと中央上に配置。無ければ社名テキスト） */
-function titleSlide(p, { title, subtitle, client, date, presenter, logo } = {}) {
+function titleSlide(p, { title, subtitle, client, date, presenter = LIBEO.name, logo } = {}) {
   const s = p.addSlide();
   s.background = { color: C.navy };
   // 質感: 控えめなドット
@@ -958,6 +972,107 @@ function calloutBubble(s, p, { x, y, w = 1.1, h = 0.44, text, color = C.blue } =
   });
 }
 
+/** ---- LIBEO自己紹介パネル（提案書の冒頭等で「私たちについて」を見せる時。
+ * name/tagline/facts の既定値は LIBEO 自身の情報） ---- */
+function companyProfile(s, p, { name = LIBEO.name, tagline = LIBEO.tagline, facts = [], stats = [], y = 1.6, h = 2.9 } = {}) {
+  const leftW = 4.6, gap = 0.4;
+  const rightX = M.edge + leftW + gap, rightW = M.W - M.edge - rightX;
+  s.addText(name, { x: M.edge, y, w: leftW, h: 0.4, fontFace: FONT.jpHeavy, bold: true, fontSize: 18, color: C.navy, margin: 0 });
+  if (tagline) s.addText(tagline, { x: M.edge, y: y + 0.42, w: leftW, h: 0.5, fontFace: FONT.jp, fontSize: 11, color: C.muted, margin: 0 });
+  const factY = y + 1.05;
+  facts.forEach((f, i) => {
+    const fy = factY + i * 0.4;
+    s.addText(f.label || '', {
+      x: M.edge, y: fy, w: 1.3, h: 0.34, fontFace: FONT.jpBold, bold: true, fontSize: 10, color: C.navy700, valign: 'middle', margin: 0,
+    });
+    s.addText(f.value || '', {
+      x: M.edge + 1.35, y: fy, w: leftW - 1.35, h: 0.34, fontFace: FONT.jp, fontSize: 11, color: C.ink, valign: 'middle', margin: 0,
+    });
+  });
+  const n = stats.length || 1, rowGap = 0.15, rowH = (h - (n - 1) * rowGap) / n;
+  stats.forEach((st, i) => {
+    const sy = y + i * (rowH + rowGap);
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, {
+      x: rightX, y: sy, w: rightW, h: rowH, rectRadius: RADIUS.card, fill: { color: C.ice }, line: { type: 'none' }, shadow: shadow(),
+    });
+    s.addText(st.label || '', { x: rightX + 0.2, y: sy + 0.1, w: rightW - 0.4, h: 0.3, fontFace: FONT.jp, fontSize: 10, color: C.muted, margin: 0 });
+    s.addText([
+      { text: String(st.value), options: { fontFace: FONT.num, bold: true, fontSize: 24, color: C.blue } },
+      { text: st.unit ? ' ' + st.unit : '', options: { fontFace: FONT.jpBold, bold: true, fontSize: 11, color: C.navy } },
+    ], { x: rightX + 0.2, y: sy + 0.36, w: rightW - 0.4, h: rowH - 0.5, valign: 'middle', margin: 0 });
+  });
+}
+
+/** ---- プラン比較表（料金プラン。featured:true のプランをネイビーで強調） ---- */
+function pricingTable(s, p, { plans = [], y = 1.6, h = 2.9 } = {}) {
+  const n = plans.length, gap = 0.25;
+  const w = (M.W - M.edge * 2 - gap * (n - 1)) / n;
+  plans.forEach((pl, i) => {
+    const x = M.edge + i * (w + gap);
+    const featured = !!pl.featured;
+    const topY = featured ? y - 0.1 : y;
+    const boxH = featured ? h + 0.1 : h;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, {
+      x, y: topY, w, h: boxH, rectRadius: RADIUS.card,
+      fill: { color: featured ? C.navy : C.white },
+      line: featured ? { type: 'none' } : { color: C.rule, width: 1 },
+      shadow: shadow(featured ? { opacity: 0.22 } : {}),
+    });
+    if (featured) {
+      s.addShape(p.shapes.ROUNDED_RECTANGLE, {
+        x: x + w / 2 - 0.55, y: topY - 0.15, w: 1.1, h: 0.28, rectRadius: 0.14, fill: { color: C.blue }, line: { type: 'none' },
+      });
+      s.addText('おすすめ', {
+        x: x + w / 2 - 0.55, y: topY - 0.15, w: 1.1, h: 0.28, align: 'center', valign: 'middle',
+        fontFace: FONT.jpBold, bold: true, fontSize: 9, color: C.white, margin: 0,
+      });
+    }
+    s.addText(pl.name || '', {
+      x: x + 0.2, y: topY + 0.22, w: w - 0.4, h: 0.32, align: 'center',
+      fontFace: FONT.jpBold, bold: true, fontSize: 14, color: featured ? C.white : C.ink, margin: 0,
+    });
+    s.addText([
+      { text: String(pl.price || ''), options: { fontFace: FONT.num, bold: true, fontSize: 24, color: featured ? C.white : C.blue } },
+      { text: pl.priceUnit ? ' ' + pl.priceUnit : '', options: { fontFace: FONT.jp, fontSize: 11, color: featured ? C.mist : C.muted } },
+    ], { x: x + 0.2, y: topY + 0.58, w: w - 0.4, h: 0.46, align: 'center', margin: 0 });
+    const bullets = (pl.items || []).map((t) => ({
+      text: t, options: { bullet: { code: '2713' }, color: featured ? C.white : C.ink, fontSize: 10.5, fontFace: FONT.jp, breakLine: true, paraSpaceAfter: 6 },
+    }));
+    s.addText(bullets, { x: x + 0.3, y: topY + 1.18, w: w - 0.5, h: boxH - 1.3, valign: 'top', margin: 0 });
+  });
+}
+
+/** ---- タイムライン（日付付きマイルストーン。zigzag上下でganttより軽い年表向け） ---- */
+function timeline(s, p, { milestones = [], y = 2.7 } = {}) {
+  const n = milestones.length;
+  const x0 = M.edge + 0.35, x1 = M.W - M.edge - 0.35;
+  s.addShape(p.shapes.LINE, { x: x0, y, w: x1 - x0, h: 0, line: { color: C.navy700, width: 2 } });
+  const step = n > 1 ? (x1 - x0) / (n - 1) : 0;
+  milestones.forEach((ms, i) => {
+    const cx = n > 1 ? x0 + i * step : (x0 + x1) / 2;
+    const d = 0.22;
+    s.addShape(p.shapes.OVAL, {
+      x: cx - d / 2, y: y - d / 2, w: d, h: d, fill: { color: ms.color || C.blue }, line: { color: C.white, width: 2 },
+    });
+    const above = i % 2 === 0;
+    const dateY = above ? y - 0.42 : y + 0.2;
+    const labelY = above ? y - 0.78 : y + 0.42;
+    const descY = above ? y - 1.18 : y + 0.78;
+    s.addText(ms.date || '', {
+      x: cx - 0.8, y: dateY, w: 1.6, h: 0.22, align: 'center',
+      fontFace: FONT.num, bold: true, fontSize: 10, color: C.navy700, margin: 0,
+    });
+    s.addText(ms.label || '', {
+      x: cx - 0.85, y: labelY, w: 1.7, h: 0.32, align: 'center',
+      fontFace: FONT.jpBold, bold: true, fontSize: 11, color: C.ink, margin: 0,
+    });
+    if (ms.desc) s.addText(ms.desc, {
+      x: cx - 0.85, y: descY, w: 1.7, h: 0.36, align: 'center',
+      fontFace: FONT.jp, fontSize: 9, color: C.muted, margin: 0,
+    });
+  });
+}
+
 /* ---- 注釈/出典（スライド下部・本文より小さく） ---- */
 function note(s, text, { y = 4.78 } = {}) {
   s.addText(text, { x: M.edge, y, w: M.W - M.edge * 2, h: 0.3, fontFace: FONT.jp, fontSize: SZ.caption, color: C.muted, italic: true, margin: 0 });
@@ -994,10 +1109,10 @@ function chartTheme(extra = {}) {
 }
 
 module.exports = {
-  C, FONT, SZ, M, RADIUS, A, ICONS, shadow,
+  C, FONT, SZ, M, RADIUS, A, ICONS, LIBEO, shadow,
   newDeck, save, marker, iconBadge, brandLogo, footer, contentSlide, titleSlide, sectionDivider,
   agenda, statCallout, miniKpiRow, chartWithInsights, twoColContrast, featureCards, dataTable, stepChevrons,
   kpiFunnel, quadrant, vennDiagram, orgChart, tamSamSom, ganttChart, pyramid, caseStudyCard,
   personaCard, customerJourney, panel, iconList, processTrail, gapAnalysis, beforeAfterPanels,
-  conclusionBand, checklist, calloutBubble, note, closingSlide, chartTheme,
+  conclusionBand, checklist, calloutBubble, companyProfile, pricingTable, timeline, note, closingSlide, chartTheme,
 };
